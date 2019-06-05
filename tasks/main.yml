@@ -1,0 +1,20 @@
+---
+- name: Create backup of DB.
+  mysql_db:
+    name: "{{ mysql_database }}"
+    state: dump
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    target: "{{ db_backup_path }}/backup_{{ mysql_database }}_{{ ansible_date_time.epoch }}_dump.sql"
+  when: "databases.stdout.find('{{ mysql_database }}') != -1"
+  ignore_errors: yes
+
+- name: Overwrite legacy DB with dump.
+  mysql_db:
+    name: "{{ mysql_database }}"
+    state: dump
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    target: "{{ db_backup_path }}/{{ mysql_backup_filename }}.sql"
+  when: "databases.stdout.find('{{ mysql_database }}') != -1"
+  ignore_errors: yes
